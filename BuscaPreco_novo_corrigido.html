@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#112841" />
+  <meta name="description" content="BuscaPreço: organize e compare suas ofertas cadastradas, com menor preço primeiro." />
+  <title>BuscaPreço | Compare ofertas</title>
+  <style>
+    :root{color-scheme:light;--ink:#132a42;--muted:#5c6d7d;--line:#dce5ed;--bg:#f4f7fa;--brand:#1266c5;--green:#0b7953;--card:#fff}
+    *{box-sizing:border-box}
+    html{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+    body{margin:0;min-height:100vh}
+    button,input{font:inherit}
+    button{cursor:pointer}
+    button:disabled{opacity:.6;cursor:wait}
+    header{background:linear-gradient(120deg,#102840,#163f64);padding:24px 16px 44px;color:#fff}
+    .wrap{max-width:1050px;margin:0 auto}
+    header h1{font-size:clamp(1.65rem,4vw,2.3rem);letter-spacing:-.035em;margin:0}
+    header p{color:#d6e4f2;margin:7px 0 0;line-height:1.5}
+    main{max-width:1050px;margin:-24px auto 0;padding:0 14px 50px}
+    .panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;margin:0 0 17px;box-shadow:0 7px 28px rgba(20,49,80,.055)}
+    .search-box{display:flex;gap:10px}
+    input{width:100%;min-width:0;border:1px solid #bccbd9;border-radius:10px;padding:13px 14px;background:#fff;color:var(--ink);outline-offset:2px}
+    input:focus{border-color:var(--brand);outline:2px solid #c0ddff}
+    .primary{border:0;border-radius:10px;padding:12px 21px;background:var(--brand);color:#fff;font-weight:700;white-space:nowrap}
+    .secondary{border:1px solid #cad8e5;border-radius:10px;padding:10px 13px;background:#eaf1f8;color:#214562;font-weight:650}
+    .subnote{color:var(--muted);font-size:.87rem;line-height:1.6;margin:10px 0 0}
+    .toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin:7px 0 16px}
+    .toggle{display:flex;align-items:center;gap:8px;font-size:.91rem;color:#385168}
+    .toggle input{width:18px;height:18px;accent-color:var(--brand)}
+    .status{font-size:.91rem;color:#32536f;background:#e7f0f9;border-radius:10px;padding:11px 14px;margin:13px 0;line-height:1.5}
+    h2{font-size:1.2rem;letter-spacing:-.015em;margin:0 0 14px}
+    .heading{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .count{font-size:.82rem;font-weight:500;color:var(--muted)}
+    .catalog{display:grid;grid-template-columns:repeat(auto-fill,minmax(225px,1fr));gap:13px;margin-bottom:22px}
+    .product{background:#fff;border:1px solid var(--line);border-radius:15px;overflow:hidden;display:flex;flex-direction:column;min-width:0;box-shadow:0 2px 10px rgba(0,30,70,.04)}
+    .product:first-child{border-color:#71b9a0}
+    .product-image{height:140px;background:linear-gradient(135deg,#e8f0f8,#f8fafb);display:flex;align-items:center;justify-content:center;color:#b3c3d4;font-size:2rem}
+    .product-image img{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply}
+    .product-body{padding:15px;display:flex;flex:1;flex-direction:column;gap:8px}
+    .tag{display:inline-block;width:max-content;max-width:100%;font-size:.72rem;font-weight:800;color:var(--green);background:#e4f5ed;border-radius:999px;padding:5px 9px}
+    .store{font-size:.79rem;font-weight:750;color:var(--brand)}
+    .name{font-size:.94rem;font-weight:650;line-height:1.4;overflow-wrap:anywhere}
+    .price{color:var(--green);font-size:1.55rem;font-weight:850;letter-spacing:-.02em;margin-top:auto}
+    .ship{font-size:.76rem;color:var(--muted);line-height:1.5}
+    .product a{background:#173c60;color:#fff;text-decoration:none;text-align:center;border-radius:9px;padding:10px;font-weight:700;font-size:.91rem}
+    .product .remove{border:1px solid #e6cdd1;border-radius:9px;padding:9px;background:#fdf4f5;color:#9d3040;font-weight:650}
+    .empty{grid-column:1/-1;background:#fff;border:1px dashed #b9c9d7;border-radius:15px;padding:25px 18px;text-align:center;color:var(--muted);line-height:1.7}
+    .empty strong{display:block;font-size:1rem;color:#294b68;margin-bottom:6px}
+    .form-grid{display:grid;grid-template-columns:1fr 1.6fr 1fr auto;gap:10px}
+    label.field{display:flex;flex-direction:column;gap:6px;font-size:.84rem;font-weight:650;color:#40566c}
+    .field button{align-self:stretch;height:48px}
+    .form-grid .submit{display:flex;align-items:end}
+    .form-grid .submit button{height:47px}
+    details summary{font-weight:700;cursor:pointer}
+    details p{font-size:.87rem;color:var(--muted);line-height:1.6}
+    .server-box{display:flex;gap:9px;flex-wrap:wrap}
+    .server-box input{flex:1 1 230px}
+    .mini{font-size:.77rem;color:var(--muted);line-height:1.65}
+    code{background:#edf2f6;overflow-wrap:anywhere;padding:2px 4px;border-radius:4px}
+    footer{font-size:.79rem;color:var(--muted);line-height:1.6;margin-top:20px}
+    @media(max-width:720px){.form-grid{grid-template-columns:1fr 1fr}.form-grid .submit{grid-column:1/-1}.form-grid .submit button{width:100%}}
+    @media(max-width:480px){.search-box{flex-direction:column}.search-box .primary{width:100%}.panel{padding:15px}.catalog{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.product-image{height:100px}.product-body{padding:11px}.price{font-size:1.2rem}.name{font-size:.84rem}.tag{font-size:.65rem}.form-grid{grid-template-columns:1fr}.form-grid .submit{grid-column:auto}}
+  </style>
+</head>
+<body>
+<header><div class="wrap"><h1>BuscaPreço</h1><p>Seu catálogo de ofertas, organizado do menor para o maior preço.</p></div></header>
+<main>
+  <section class="panel" aria-label="Pesquisar produtos">
+    <form id="search-form" class="search-box">
+      <input id="query" type="search" placeholder="Ex.: fone Bluetooth branco" aria-label="Digite o nome do produto" autocomplete="off" />
+      <button class="primary" type="submit" id="search-button">Pesquisar</button>
+    </form>
+    <p class="subnote">Esta versão funciona como catálogo local, mesmo sem GitHub. Para carregar preços reais automaticamente das lojas, é necessário conectar um servidor com acesso autorizado.</p>
+    <div id="status" class="status" role="status" aria-live="polite">Página carregada. Pesquise nas ofertas salvas ou cadastre uma nova oferta abaixo.</div>
+  </section>
+
+  <section aria-label="Catálogo de produtos">
+    <div class="heading"><h2>Catálogo <span class="count" id="count">(0 ofertas)</span></h2></div>
+    <div class="toolbar">
+      <label class="toggle"><input type="checkbox" id="free-only" checked /> Somente frete grátis informado</label>
+      <span class="mini">Ordenação: menor preço primeiro</span>
+    </div>
+    <div id="catalog" class="catalog"></div>
+  </section>
+
+  <section class="panel" id="add-offer">
+    <h2>Adicionar oferta encontrada</h2>
+    <p class="subnote" style="margin-top:-4px;margin-bottom:13px">Sem campo de link. O frete grátis fica marcado como informado, mas não é verificado automaticamente.</p>
+    <form id="add-form" class="form-grid">
+      <label class="field">Loja<input id="store" name="store" required maxlength="70" placeholder="Ex.: Amazon" /></label>
+      <label class="field">Produto<input id="product" name="product" required maxlength="150" placeholder="Ex.: Fone Bluetooth branco" /></label>
+      <label class="field">Preço em reais<input id="price" name="price" required type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="Ex.: 39,90" /></label>
+      <div class="submit"><button type="submit" class="primary">Adicionar</button></div>
+    </form>
+  </section>
+
+  <details class="panel" id="advanced">
+    <summary>Conectar API de preços no futuro (opcional)</summary>
+    <p>GitHub Pages publica a página, mas não fornece sozinho preços da Amazon ou do Mercado Livre. Para preços automáticos, conecte uma API HTTPS autorizada que permita CORS e responda a <code>?q=nome-do-produto</code> com JSON neste formato:</p>
+    <p><code>{"results":[{"store":"Loja","title":"Produto","price":49.90,"free_shipping":true,"permalink":"https://loja.exemplo/item","thumbnail":"https://loja.exemplo/foto.jpg"}]}</code></p>
+    <p>Não coloque chaves, senhas ou tokens privados no HTML. O endereço precisa ser o de um servidor que já esteja funcionando.</p>
+    <form id="api-form" class="server-box">
+      <input type="url" id="api-url" placeholder="https://seu-servidor.com/api/search" aria-label="Endereço da API" />
+      <button type="submit" class="primary">Salvar API</button>
+      <button type="button" id="clear-api" class="secondary">Desconectar</button>
+    </form>
+  </details>
+
+  <footer>BuscaPreço é um protótipo independente. Os preços e a informação de frete devem ser confirmados diretamente com cada loja. A primeira oferta é apenas a mais barata entre as cadastradas ou retornadas pela integração, não necessariamente a mais barata da internet. As ofertas locais ficam neste navegador e podem desaparecer se seus dados forem apagados.</footer>
+</main>
+<script>
+(function(){
+  'use strict';
+  const byId=(id)=>document.getElementById(id);
+  const STORAGE_KEY='buscapreco_offers_v3';
+  const API_KEY='buscapreco_api_v3';
+  const fmt=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
+  let searchTerm='';
+  let offers=[];
+  let remote=[];
+  let storageAvailable=true;
+  function read(key,fallback){try{return localStorage.getItem(key)??fallback}catch(err){storageAvailable=false;return fallback}}
+  function save(key,value){try{localStorage.setItem(key,value);return true}catch(err){storageAvailable=false;return false}}
+  function remove(key){try{localStorage.removeItem(key)}catch(err){storageAvailable=false}}
+  function safeOffers(){try{const value=JSON.parse(read(STORAGE_KEY,'[]'));return Array.isArray(value)?value.filter(x=>x&&typeof x.title==='string'&&typeof x.store==='string'&&Number.isFinite(Number(x.price))):[]}catch(err){return []}}
+  offers=safeOffers();
+  byId('api-url').value=read(API_KEY,'');
+  function normalize(value){return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()}
+  function matches(item,query){const words=normalize(query).split(/\s+/).filter(Boolean);const haystack=normalize(item.title+' '+item.store);return words.every(word=>haystack.includes(word))}
+  function status(text){byId('status').textContent=text}
+  function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n}
+  function cleanURL(value){try{const u=new URL(value);return u.protocol==='https:'?u.href:null}catch(err){return null}}
+  function render(){
+    const onlyFree=byId('free-only').checked;
+    const catalog=byId('catalog');
+    catalog.replaceChildren();
+    const list=[...offers,...remote].filter(x=>Number(x.price)>0&&Number.isFinite(Number(x.price))&&matches(x,searchTerm)&&(!onlyFree||x.free_shipping===true)).sort((a,b)=>Number(a.price)-Number(b.price));
+    byId('count').textContent='('+list.length+(list.length===1?' oferta)':' ofertas)');
+    if(list.length===0){
+      const box=el('div','empty');
+      box.append(el('strong','',searchTerm?'Nenhuma oferta encontrada para esta pesquisa.':'Seu catálogo ainda está vazio.'));
+      box.append(el('span','',searchTerm?'Tente outros termos ou cadastre uma oferta com esse produto.':'Cadastre uma oferta logo abaixo para começar a comparar preços.'));
+      catalog.append(box);return;
+    }
+    for(let i=0;i<list.length;i++){
+      const p=list[i];const card=el('article','product');
+      const image=el('div','product-image');const thumb=cleanURL(p.thumbnail);
+      if(thumb){const img=el('img');img.src=thumb;img.loading='lazy';img.alt='Foto de '+p.title;img.referrerPolicy='no-referrer';image.append(img)}
+      else image.append(el('span','', '◈'));
+      card.append(image);
+      const body=el('div','product-body');
+      if(i===0)body.append(el('div','tag','MENOR PREÇO DA LISTA'));
+      body.append(el('div','store',p.store));
+      body.append(el('div','name',p.title));
+      body.append(el('div','price',fmt.format(Number(p.price))));
+      body.append(el('div','ship',p.manual?'Frete grátis informado por você · não verificado':'Frete grátis informado pela fonte · confirmar no anúncio'));
+      const direct=cleanURL(p.permalink);
+      if(direct){const a=el('a','', 'Ver anúncio ↗');a.href=direct;a.target='_blank';a.rel='noopener noreferrer';body.append(a)}
+      if(p.manual){const btn=el('button','remove','Remover oferta');btn.type='button';btn.addEventListener('click',()=>{offers=offers.filter(x=>x.id!==p.id);save(STORAGE_KEY,JSON.stringify(offers));render();status('Oferta removida do catálogo.');});body.append(btn)}
+      card.append(body);catalog.append(card);
+    }
+  }
+  async function search(event){
+    event.preventDefault();
+    searchTerm=byId('query').value.trim();
+    remote=[];
+    render();
+    const api=read(API_KEY,'').trim();
+    if(!api){status('Pesquisa concluída nas ofertas cadastradas ('+byId('count').textContent+'). Para consultar lojas automaticamente, será necessária uma API autorizada.');return}
+    if(!searchTerm){status('Digite o produto para consultar o servidor, ou consulte todas as ofertas salvas.');return}
+    const btn=byId('search-button');btn.disabled=true;status('Consultando a API configurada…');
+    const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),9000);
+    try{
+      const url=new URL(api);url.searchParams.set('q',searchTerm);
+      const response=await fetch(url.href,{signal:controller.signal,headers:{Accept:'application/json'}});
+      if(!response.ok)throw new Error('HTTP '+response.status);
+      const data=await response.json();const values=Array.isArray(data)?data:data.results;
+      if(!Array.isArray(values))throw new Error('resposta JSON incompatível');
+      remote=values.filter(x=>x&&x.free_shipping===true&&Number.isFinite(Number(x.price))&&Number(x.price)>0&&x.title).map(x=>({id:null,title:String(x.title),store:String(x.store||'Loja'),price:Number(x.price),thumbnail:cleanURL(x.thumbnail),permalink:cleanURL(x.permalink),free_shipping:true,manual:false}));
+      render();status('Busca concluída: '+remote.length+' ofertas com frete grátis informado pela API. Confirme frete e preço final na loja.');
+    }catch(err){status('A consulta ao servidor não funcionou ('+(err.name==='AbortError'?'tempo esgotado':err.message)+'). O catálogo local continua disponível.');}
+    finally{clearTimeout(timer);btn.disabled=false;}
+  }
+  byId('search-form').addEventListener('submit',search);
+  byId('add-form').addEventListener('submit',(event)=>{
+    event.preventDefault();const store=byId('store').value.trim(),title=byId('product').value.trim(),price=Number(byId('price').value);
+    if(!store||!title||!Number.isFinite(price)||price<=0){status('Preencha loja, produto e um preço válido.');return}
+    offers.push({id:String(Date.now())+'_'+Math.random().toString(36).slice(2),store,title,price,free_shipping:true,manual:true,thumbnail:null,permalink:null});
+    const persisted=save(STORAGE_KEY,JSON.stringify(offers));
+    byId('add-form').reset();searchTerm='';byId('query').value='';
+    render();status(persisted?'Oferta cadastrada e salva neste navegador. O frete grátis não foi verificado.':'Oferta cadastrada para esta sessão. Este navegador bloqueou o salvamento permanente.');
+  });
+  byId('free-only').addEventListener('change',render);
+  byId('api-form').addEventListener('submit',(event)=>{
+    event.preventDefault();const value=byId('api-url').value.trim();
+    if(value&&!cleanURL(value)){status('Use um endereço HTTPS válido para a API.');return}
+    if(value){save(API_KEY,value);status('Endereço salvo. Pesquise um produto para tentar carregar ofertas da API.');}
+    else{remove(API_KEY);status('API removida. Pesquisa local ativa.');}
+  });
+  byId('clear-api').addEventListener('click',()=>{remove(API_KEY);byId('api-url').value='';remote=[];render();status('API desconectada. As ofertas salvas continuam disponíveis.');});
+  if(!storageAvailable)status('Página carregada. Aviso: o navegador restringe o salvamento local.');
+  render();
+})();
+</script>
+</body>
+</html>
